@@ -43,14 +43,14 @@ public class ProcessorNullJobConfiguration {
     public Step step() {
         return stepBuilderFactory.get(BEAN_PREFIX + "step")
                 .<Teacher, Teacher>chunk(CHUNK_SIZE)
-                .reader(reader())
-                .processor(processor())
-                .writer(writer())
+                .reader(filterReader())
+                .processor(filterProcessor())
+                .writer(filterWriter())
                 .build();
     }
 
     @Bean
-    public JpaPagingItemReader<Teacher> reader() {
+    public JpaPagingItemReader<Teacher> filterReader() {
         return new JpaPagingItemReaderBuilder<Teacher>()
                 .name(BEAN_PREFIX+"reader")
                 .entityManagerFactory(emf)
@@ -60,7 +60,7 @@ public class ProcessorNullJobConfiguration {
     }
 
     @Bean
-    public ItemProcessor<Teacher, Teacher> processor() {
+    public ItemProcessor<Teacher, Teacher> filterProcessor() {
         return teacher -> {
 
             boolean isIgnoreTarget = teacher.getId() % 2 == 0L;
@@ -73,7 +73,7 @@ public class ProcessorNullJobConfiguration {
         };
     }
 
-    private ItemWriter<Teacher> writer() {
+    private ItemWriter<Teacher> filterWriter() {
         return items -> {
             for (Teacher item : items) {
                 log.info("Teacher Name={}", item.getName());

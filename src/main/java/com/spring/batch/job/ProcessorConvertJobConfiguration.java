@@ -34,23 +34,23 @@ public class ProcessorConvertJobConfiguration {
     public Job job() {
         return jobBuilderFactory.get(JOB_NAME)
                 .preventRestart()
-                .start(step())
+                .start(convertStep())
                 .build();
     }
 
     @Bean(BEAN_PREFIX + "step")
     @JobScope
-    public Step step() {
+    public Step convertStep() {
         return stepBuilderFactory.get(BEAN_PREFIX + "step")
                 .<Teacher, String>chunk(CHUNK_SIZE)
-                .reader(reader())
-                .processor(processor())
+                .reader(convertReader())
+                .processor(convertProcessor())
                 .writer(writer())
                 .build();
     }
 
     @Bean
-    public JpaPagingItemReader<Teacher> reader() {
+    public JpaPagingItemReader<Teacher> convertReader() {
         return new JpaPagingItemReaderBuilder<Teacher>()
                 .name(BEAN_PREFIX+"reader")
                 .entityManagerFactory(emf)
@@ -60,7 +60,7 @@ public class ProcessorConvertJobConfiguration {
     }
 
     @Bean
-    public ItemProcessor<Teacher, String> processor() {
+    public ItemProcessor<Teacher, String> convertProcessor() {
         return Teacher::getName;
     }
 
